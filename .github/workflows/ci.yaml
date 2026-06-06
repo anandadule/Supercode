@@ -1,0 +1,136 @@
+name: CI
+
+# Run on every push to main and on every pull request. Concurrency control
+# cancels in-progress runs on the same branch/PR so we don't burn CI minutes
+# on stale commits.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Quality gates. Each runs in parallel so failures surface as fast as possible
+# instead of waiting for the previous job in a serial chain.
+jobs:
+  typecheck:
+    name: TypeScript typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.14.4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache TypeScript build info
+        uses: actions/cache@v4
+        with:
+          path: |
+            .tsbuildinfo
+            node_modules/.cache
+          key: ${{ runner.os }}-typescript-${{ hashFiles('**/tsconfig.json', 'app/**/*.ts', 'app/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-typescript-
+
+      - name: Run typecheck
+        run: pnpm run typecheck
+
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.14.4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache ESLint
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/eslint
+          key: ${{ runner.os }}-eslint-${{ hashFiles('.eslintrc*', 'app/**/*.ts', 'app/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-eslint-
+
+      - name: Run ESLint
+        run: pnpm run lint
+
+  test:
+    name: Unit tests (vitest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.14.4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm run test
+
+      - name: Upload test coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ github.run_id }}
+          path: coverage/
+          retention-days: 7
+
+  # Aggregator job — fails the overall check if any quality gate fails.
+  # Branch protection should require this job.
+  quality-gate:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint, test]
+    if: always()
+    steps:
+      - name: Check upstream results
+        run: |
+          if [ "${{ needs.typecheck.result }}" != "success" ] || \
+             [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.test.result }}" != "success" ]; then
+            echo "One or more quality gates failed:"
+            echo "  typecheck: ${{ needs.typecheck.result }}"
+            echo "  lint:      ${{ needs.lint.result }}"
+            echo "  test:      ${{ needs.test.result }}"
+            exit 1
+          fi
+          echo "All quality gates passed ✅"
