@@ -1,0 +1,180 @@
+.rayContainer {
+  --ray-color-primary: color-mix(in srgb, var(--primary-color), transparent 60%);
+  --ray-color-secondary: color-mix(in srgb, var(--secondary-color), transparent 60%);
+  --ray-color-accent: color-mix(in srgb, var(--accent-color), transparent 60%);
+
+  --ray-gradient-primary: radial-gradient(var(--ray-color-primary) 0%, transparent 70%);
+  --ray-gradient-secondary: radial-gradient(var(--ray-color-secondary) 0%, transparent 70%);
+  --ray-gradient-accent: radial-gradient(var(--ray-color-accent) 0%, transparent 70%);
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  animation: fadeIn 2s ease-out;
+  pointer-events: none;
+  z-index: 0;
+
+  :global(html[data-theme='dark']) & {
+    mix-blend-mode: screen;
+    opacity: 0.35;
+  }
+
+  :global(html[data-theme='light']) & {
+    mix-blend-mode: multiply;
+    opacity: 0.15;
+  }
+}
+
+.lightRay {
+  position: absolute;
+  border-radius: 100%;
+
+  :global(html[data-theme='dark']) & {
+    mix-blend-mode: screen;
+  }
+
+  :global(html[data-theme='light']) & {
+    mix-blend-mode: multiply;
+  }
+}
+
+.ray1 {
+  width: 500px;
+  height: 700px;
+  background: var(--ray-gradient-primary);
+  transform: rotate(65deg);
+  top: -400px;
+  left: -50px;
+  filter: blur(120px);
+  opacity: 0.3;
+  animation: float1 30s infinite ease-in-out;
+}
+
+.ray2 {
+  width: 350px;
+  height: 500px;
+  background: var(--ray-gradient-secondary);
+  transform: rotate(-30deg);
+  top: -250px;
+  left: 250px;
+  filter: blur(100px);
+  opacity: 0.25;
+  animation: float2 35s infinite ease-in-out;
+}
+
+.ray3 {
+  width: 400px;
+  height: 350px;
+  background: var(--ray-gradient-accent);
+  top: -280px;
+  left: 550px;
+  filter: blur(110px);
+  opacity: 0.2;
+  animation: float3 40s infinite ease-in-out;
+}
+
+.ray4 {
+  width: 350px;
+  height: 400px;
+  background: var(--ray-gradient-secondary);
+  top: -300px;
+  left: 850px;
+  filter: blur(95px);
+  opacity: 0.2;
+  animation: float4 32s infinite ease-in-out;
+}
+
+.ray5 {
+  width: 300px;
+  height: 450px;
+  background: var(--ray-gradient-primary);
+  transform: rotate(-45deg);
+  top: -200px;
+  left: 1050px;
+  filter: blur(85px);
+  opacity: 0.25;
+  animation: float5 35s infinite ease-in-out;
+}
+
+.ray6 {
+  width: 250px;
+  height: 600px;
+  background: var(--ray-gradient-accent);
+  transform: rotate(75deg);
+  top: -350px;
+  left: 650px;
+  filter: blur(120px);
+  opacity: 0.15;
+  animation: float6 38s infinite ease-in-out;
+}
+
+@keyframes float1 {
+  0%,
+  100% {
+    transform: rotate(65deg) translate(0, 0);
+  }
+  50% {
+    transform: rotate(68deg) translate(15px, 10px);
+  }
+}
+
+@keyframes float2 {
+  0%,
+  100% {
+    transform: rotate(-30deg) scale(1);
+  }
+  50% {
+    transform: rotate(-28deg) scale(1.05);
+  }
+}
+
+@keyframes float3 {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(20px, 10px) rotate(2deg);
+  }
+}
+
+@keyframes float4 {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.08) rotate(5deg);
+  }
+}
+
+@keyframes float5 {
+  0%,
+  100% {
+    transform: rotate(-45deg) translate(0, 0);
+  }
+  50% {
+    transform: rotate(-43deg) translate(15px, -10px);
+  }
+}
+
+@keyframes float6 {
+  0%,
+  100% {
+    transform: rotate(75deg) scale(1);
+    filter: blur(120px);
+  }
+  50% {
+    transform: rotate(78deg) scale(1.05);
+    filter: blur(100px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
