@@ -46,3 +46,7 @@ Welcome to Supercode, an AI-Powered Full-Stack Web Development environment in th
 ## Contributing
 
 We welcome contributions!
+
+## License
+
+This project is licensed under the MIT License.
