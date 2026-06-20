@@ -1,5 +1,5 @@
-appId: com.stackblitz.bolt.diy
-productName: Bolt Local
+appId: com.anandadule.supercode
+productName: Supercode
 directories:
   buildResources: build
   output: dist
@@ -55,9 +55,8 @@ npmRebuild: false
 
 publish:
   provider: github
-  owner: Derek-X-Wang
-  repo: bolt.local
-  private: true
+  owner: anandadule
+  repo: Supercode
   releaseType: release
 
 electronDownload:
